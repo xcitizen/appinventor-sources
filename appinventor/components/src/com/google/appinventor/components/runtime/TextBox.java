@@ -151,6 +151,17 @@ public final class TextBox extends TextBoxBase {
       (InputMethodManager) container.$context().getSystemService(Context.INPUT_METHOD_SERVICE);
     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
   }
+  
+  /**
+   * Show the soft keyboard
+   */
+  @SimpleFunction(
+      description = "Show the keyboard.  Only is focusable")
+  public void ShowKeyboard() {
+    InputMethodManager imm =
+      (InputMethodManager) container.$context().getSystemService(Context.INPUT_METHOD_SERVICE);
+    imm.showSoftInput(view, InputMethodManager.SHOW_FORCED);
+  }
 
   /**
    * Multi line property getter method.
