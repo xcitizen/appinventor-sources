@@ -20,6 +20,7 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.widget.EditText;
+import com.google.appinventor.components.annotations.SimpleFunction;
 
 /**
  * Underlying base class for TextBox, not directly accessible to Simple
@@ -453,4 +454,13 @@ public abstract class TextBoxBase extends AndroidViewComponent
       LostFocus();
     }
   }
+  
+  /**
+  * Set Focus.
+  */
+  @SimpleFunction
+  public void SetFocus() { 
+  TextViewUtil.setFocus(view);
+  }
+
 }
