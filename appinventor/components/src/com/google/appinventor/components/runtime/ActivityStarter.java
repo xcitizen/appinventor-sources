@@ -461,7 +461,7 @@ public class ActivityStarter extends AndroidNonvisibleComponent
    
   /**
    * Block ShareText:
-   * Lauch activity for share text directly xcitizen.team@Gmail.com
+   * Lauch activity for share text directly xcitizen.team@gmail.com
    *
    */
    
