@@ -10,6 +10,7 @@ import com.google.appinventor.components.annotations.PropertyCategory;
 import com.google.appinventor.components.annotations.SimpleEvent;
 import com.google.appinventor.components.annotations.SimpleObject;
 import com.google.appinventor.components.annotations.SimpleProperty;
+import com.google.appinventor.components.annotations.SimpleFunction;
 import com.google.appinventor.components.common.ComponentConstants;
 import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.runtime.util.TextViewUtil;
@@ -20,7 +21,6 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.widget.EditText;
-import com.google.appinventor.components.annotations.SimpleFunction;
 
 /**
  * Underlying base class for TextBox, not directly accessible to Simple
@@ -456,11 +456,12 @@ public abstract class TextBoxBase extends AndroidViewComponent
   }
   
   /**
-  * Set Focus.
-  */
+   * Set Focus block
+   */
+   
   @SimpleFunction
   public void SetFocus() { 
   TextViewUtil.setFocus(view);
   }
-
+   
 }

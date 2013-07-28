@@ -69,14 +69,8 @@ public interface Images extends Resources {
   /**
    * Designer palette item: accelerometersensor component
    */
-  @Source("com/google/appinventor/images/nearfield.png")
-  ImageResource nearfield();
-
-   /**
-    * Designer palette item: accelerometersensor component
-    */
-   @Source("com/google/appinventor/images/accelerometersensor.png")
-   ImageResource accelerometersensor();
+  @Source("com/google/appinventor/images/accelerometersensor.png")
+  ImageResource accelerometersensor();
 
   /**
    * Designer palette item: barcode scanner component
@@ -380,6 +374,22 @@ public interface Images extends Resources {
   // www.pdclipart.org/displayimage.php/?pid=1047
   @Source("com/google/appinventor/images/webviewerbig.png")
   ImageResource webviewerbig();
+  
+  @Source("com/google/appinventor/images/sqlite.png")
+  ImageResource sqlite();
+  
+  @Source("com/google/appinventor/images/files.png")
+  ImageResource files();
+  
+  @Source("com/google/appinventor/images/GoogleCloudMessaging.png")
+  ImageResource GoogleCloudMessaging();
+
+  @Source("com/google/appinventor/images/admob.png")
+  ImageResource admob();
+
+  @Source("com/google/appinventor/images/admobbaner.png")
+  ImageResource admobbaner();
+
 
   /**
    * Designer palette item: Web component

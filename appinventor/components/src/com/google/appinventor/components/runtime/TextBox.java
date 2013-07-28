@@ -153,10 +153,10 @@ public final class TextBox extends TextBoxBase {
   }
   
   /**
-   * Show the soft keyboard
+   * Show the soft keyboard (xcitizen.team@gmail.com)
    */
   @SimpleFunction(
-      description = "Show the keyboard.  Only is focusable")
+      description = "Show the keyboard. Only show if textbox set in focus.")
   public void ShowKeyboard() {
     InputMethodManager imm =
       (InputMethodManager) container.$context().getSystemService(Context.INPUT_METHOD_SERVICE);

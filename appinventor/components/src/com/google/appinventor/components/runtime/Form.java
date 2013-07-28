@@ -35,6 +35,9 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ScrollView;
 
+import android.view.WindowManager;
+import android.view.Window;
+
 import com.google.appinventor.components.annotations.DesignerComponent;
 import com.google.appinventor.components.annotations.DesignerProperty;
 import com.google.appinventor.components.annotations.PropertyCategory;
@@ -59,7 +62,15 @@ import com.google.appinventor.components.runtime.util.MediaUtil;
 import com.google.appinventor.components.runtime.util.OnInitializeListener;
 import com.google.appinventor.components.runtime.util.SdkLevel;
 import com.google.appinventor.components.runtime.util.ViewUtil;
-
+/*
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.GestureDetector;
+import java.lang.Math;
+import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.GestureDetector.OnGestureListener;
+*/
 /**
  * Component underlying activities and UI apps, not directly accessible to Simple programmers.
  *
@@ -76,8 +87,10 @@ import com.google.appinventor.components.runtime.util.ViewUtil;
 @SimpleObject
 @UsesPermissions(permissionNames = "android.permission.INTERNET,android.permission.ACCESS_WIFI_STATE,android.permission.ACCESS_NETWORK_STATE")
 public class Form extends Activity
-    implements Component, ComponentContainer, HandlesEventDispatching {
+    implements Component, ComponentContainer, HandlesEventDispatching/*, OnGestureListener*/ {
   private static final String LOG_TAG = "Form";
+  
+  private String menuOptions = "Close:ic_menu_close_clear_cancel|About:ic_menu_help";
 
   // *** set this back to false after review
   private static final boolean DEBUG = true;
@@ -135,7 +148,6 @@ public class Form extends Activity
   // Application lifecycle related fields
   private final HashMap<Integer, ActivityResultListener> activityResultMap = Maps.newHashMap();
   private final Set<OnStopListener> onStopListeners = Sets.newHashSet();
-  private final Set<OnNewIntentListener> onNewIntentListeners = Sets.newHashSet();
   private final Set<OnResumeListener> onResumeListeners = Sets.newHashSet();
   private final Set<OnPauseListener> onPauseListeners = Sets.newHashSet();
   private final Set<OnDestroyListener> onDestroyListeners = Sets.newHashSet();
@@ -156,12 +168,25 @@ public class Form extends Activity
   private String nextFormName;
 
   private FullScreenVideoUtil fullScreenVideoUtil;
+  
+  private static Component component;
+  
+  
+  
+  private static final int SWIPE_MIN_DISTANCE = 120;
+  private static final int SWIPE_MAX_OFF_PATH = 250;
+  private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+  //private GestureDetector gestureDetector;
+  //View.OnTouchListener gestureListener;
+  
 
   @Override
   public void onCreate(Bundle icicle) {
     // Called when the activity is first created
     super.onCreate(icicle);
-
+	
+	Form.component = (Form)this;
+	
     // Figure out the name of this form.
     String className = getClass().getName();
     int lastDot = className.lastIndexOf('.');
@@ -193,15 +218,127 @@ public class Form extends Activity
     // before initialization finishes. Instead the compiler suppresses the invocation of the
     // event and leaves it up to the library implementation.
     Initialize();
+	
+	/*// Gesture detection
+        gestureDetector = new GestureDetector(this, new MyGestureDetector());
+        gestureListener = new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+				Log.d("FormGestureDetector","ontouch");
+                return gestureDetector.onTouchEvent(event);
+            }
+        };*/
   }
+  /*
+		@Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+		Log.d("FormGestureDetector","ofling");
+            try {
+                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
+                    return false;
+                // right to left swipe
+                if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    Log.d("FormGestureDetector","LEFT SWIPE");
+                }  else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    Log.d("FormGestureDetector","RIGHT SWIPE");
+                }
+            } catch (Exception e) {
+                // nothing
+            }
+            return false;
+        }
+		
+		@Override
+        public void onLongPress(MotionEvent e) {
+		Log.d("FormGestureDetector","longpress");
+            return;
+        }
+		
+		@Override
+        public boolean onDown(MotionEvent e) {
+		Log.d("FormGestureDetector","ondown");
+            return false;
+        }
+		
+		@Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+		Log.d("FormGestureDetector","hscroll");
+            return false;
+        }
+		
+		@Override
+        public void onShowPress(MotionEvent e) {
+		Log.d("FormGestureDetector","showpress");
+            return;
+        }
+		
+		@Override
+        public boolean onSingleTapUp(MotionEvent e) {
+		Log.d("FormGestureDetector","singletap");
+            return false;
+        }
+  
+  
+  public class MyGestureDetector extends SimpleOnGestureListener {
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+		Log.d("FormGestureDetector","ifling");
+            try {
+                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
+                    return false;
+                // right to left swipe
+                if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    Log.d("FormGestureDetector","LEFT SWIPE");
+                }  else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    Log.d("FormGestureDetector","RIGHT SWIPE");
+                }
+            } catch (Exception e) {
+                // nothing
+            }
+            return false;
+        }
 
+    }
+*/
   private void defaultPropertyValues() {
     Scrollable(true); // frameLayout is created in Scrollable()
     BackgroundImage("");
     BackgroundColor(Component.COLOR_WHITE);
     Title("");
   }
-
+  
+  
+  
+  
+  	/*
+    @Override
+	public boolean onTouchEvent(MotionEvent event){ 
+			
+		int action = MotionEventCompat.getActionMasked(event);
+			
+		switch(action) {
+			case (MotionEvent.ACTION_DOWN) :
+				Log.d("FormGestureDetector","Action was DOWN");
+				return true;
+			case (MotionEvent.ACTION_MOVE) :
+				Log.d("FormGestureDetector","Action was MOVE");
+				return true;
+			case (MotionEvent.ACTION_UP) :
+				Log.d("FormGestureDetector","Action was UP");
+				return true;
+			case (MotionEvent.ACTION_CANCEL) :
+				Log.d("FormGestureDetector","Action was CANCEL");
+				return true;
+			case (MotionEvent.ACTION_OUTSIDE) :
+				Log.d("FormGestureDetector","Movement occurred outside bounds " +
+						"of current screen element");
+				return true;      
+			default : 
+				return super.onTouchEvent(event);
+		}      
+  
+    }
+  
+*/
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
@@ -244,24 +381,159 @@ public class Form extends Activity
    * 5, we can simply override the onBackPressed method rather
    * than bothering with onKeyDown)
    */
-  @Override
-  public boolean onKeyDown(int keyCode, KeyEvent event) {
-    if (keyCode == KeyEvent.KEYCODE_BACK) {      
-      if (!BackPressed()) {
-        boolean handled = super.onKeyDown(keyCode, event);
-        AnimationUtil.ApplyCloseScreenAnimation(this, closeAnimType);
-        return handled;
-      } else {
-        return true;
-      }      
-    }
-    return super.onKeyDown(keyCode, event);
+  @SimpleEvent(description = "Fires when menu button is pressed")
+  public void OnMenuKey() {
+    
   }
 
-  @SimpleEvent(description = "Device back button pressed.")
-  public boolean BackPressed() {
-    return EventDispatcher.dispatchEvent(this, "BackPressed");
+  @SimpleEvent(description = "Fires when search button is pressed")
+  public void OnSearchKey() {
+    
   }
+
+  @SimpleEvent(description = "Fires when back button is pressed")
+  public void OnBackKey() {
+    
+  }
+
+  @SimpleEvent(description = "Fires when Vol + button is pressed")
+  public void OnVolumeupKey() {
+    
+  }
+
+  @SimpleEvent(description = "Fires when Vol - button is pressed")
+  public void OnVolumedownKey() {
+    
+  }
+
+  @SimpleEvent(description = "Press Key A")
+  public void KeyA() {
+    
+  }
+
+  @SimpleEvent(description = "Press Key B")
+  public void KeyB() {
+    
+  }
+   
+  @SimpleEvent(description = "Press Key C")
+  public void KeyC() {
+    
+  }
+
+  @SimpleEvent(description = "Press Key D")
+  public void KeyD() {
+    
+  }
+
+  @SimpleEvent(description = "Press Key E")
+  public void KeyE() {
+    
+  }
+
+  @SimpleEvent(description = "Press Key F")
+  public void KeyF() {
+    
+  }
+
+  @SimpleEvent(description = "Press Key Enter")
+  public void KeyEnter() {
+    
+  }
+
+
+  @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+      
+
+
+        /*if(keyCode == KeyEvent.KEYCODE_HOME) {
+    	Toast.makeText(getApplicationContext(),"HIT! H", Toast.LENGTH_SHORT).show();
+		return true;
+	} else 
+*/
+	if(keyCode == KeyEvent.KEYCODE_MENU) {
+		if (EventDispatcher.dispatchEvent(this, "OnMenuKey")) {
+			return true;
+		} else {
+			return super.onKeyDown(keyCode, event);
+		}
+	} else if(keyCode == KeyEvent.KEYCODE_SEARCH) {
+		if (EventDispatcher.dispatchEvent(this, "OnSearchKey")) {
+			return true;
+		} else {
+			return super.onKeyDown(keyCode, event);
+		}
+	} else if(keyCode == KeyEvent.KEYCODE_BACK) {
+		if (EventDispatcher.dispatchEvent(this, "OnBackKey")) {			
+                       return true;
+		} else {
+			return super.onKeyDown(keyCode, event);
+		}
+	} else if(keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+		if (EventDispatcher.dispatchEvent(this, "OnVolumeupKey")) {
+			return true;
+		} else {
+			return super.onKeyDown(keyCode, event);
+                }
+
+        } else if(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+		if (EventDispatcher.dispatchEvent(this, "OnVolumedownKey")) {
+			return true;
+		} else {
+			return super.onKeyDown(keyCode, event);
+                } 
+        } else if(keyCode == KeyEvent.KEYCODE_A) {
+		if (EventDispatcher.dispatchEvent(this, "KeyA")) {
+			return true;
+		} else {
+			return super.onKeyDown(keyCode, event);
+		}
+	} else if(keyCode == KeyEvent.KEYCODE_B) {
+		if (EventDispatcher.dispatchEvent(this, "KeyB")) {
+			return true;
+		} else {
+			return super.onKeyDown(keyCode, event);
+		}
+	} else if(keyCode == KeyEvent.KEYCODE_C) {
+		if (EventDispatcher.dispatchEvent(this, "KeyC")) {			
+                       return true;
+		} else {
+			return super.onKeyDown(keyCode, event);
+		}
+	} else if(keyCode == KeyEvent.KEYCODE_D) {
+		if (EventDispatcher.dispatchEvent(this, "KeyD")) {
+			return true;
+		} else {
+			return super.onKeyDown(keyCode, event);
+                }
+
+        } else if(keyCode == KeyEvent.KEYCODE_E) {
+		if (EventDispatcher.dispatchEvent(this, "KeyE")) {
+			return true;
+		} else {
+			return super.onKeyDown(keyCode, event);
+                } 
+        } else if(keyCode == KeyEvent.KEYCODE_F) {
+		if (EventDispatcher.dispatchEvent(this, "KeyF")) {
+			return true;
+		} else {
+			return super.onKeyDown(keyCode, event);
+                } 
+        } else if(keyCode == KeyEvent.KEYCODE_ENTER) {
+		if (EventDispatcher.dispatchEvent(this, "KeyEnter")) {
+			return true;
+		} else {
+			return super.onKeyDown(keyCode, event);
+                }
+        
+	} else {
+
+
+        return super.onKeyDown(keyCode, event);
+	}
+    }
   
   // onActivityResult should be triggered in only two cases:
   // (1) The result is for some other component in the app, not this Form itself
@@ -368,19 +640,6 @@ public class Form extends Activity
    */
   public void registerForOnInitialize(OnInitializeListener component) {
     onInitializeListeners.add(component);
-  }
-
-  @Override
-  protected void onNewIntent(Intent intent) {
-    super.onNewIntent(intent);
-    Log.d(LOG_TAG, "Form " + formName + " got onNewIntent " + intent);
-    for (OnNewIntentListener onNewIntentListener : onNewIntentListeners) {
-      onNewIntentListener.onNewIntent(intent);
-    }
-  }
-
-  public void registerForOnNewIntent(OnNewIntentListener component) {
-    onNewIntentListeners.add(component);
   }
 
   @Override
@@ -585,7 +844,20 @@ public class Form extends Activity
     if (frameLayout != null) {
       frameLayout.removeAllViews();
     }
-
+	/*
+	//Whatever, do it always! @@PABLOKO
+	// hide titlebar of application
+	// must be before setting the layout
+	if (scrollable==true) {
+	requestWindowFeature(Window.FEATURE_LEFT_ICON);
+	}
+	// hide statusbar of Android
+	// could also be done later
+	if (scrollable==false) {
+	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+	WindowManager.LayoutParams.FLAG_FULLSCREEN);
+	}
+*/
     this.scrollable = scrollable;
 
     frameLayout = scrollable ? new ScrollView(this) : new FrameLayout(this);
@@ -598,6 +870,12 @@ public class Form extends Activity
       ViewUtil.setBackgroundImage(frameLayout, backgroundDrawable);
     }
 
+	
+	
+	
+	
+	
+	
     setContentView(frameLayout);
     frameLayout.requestLayout();
   }
@@ -861,50 +1139,17 @@ public class Form extends Activity
    }
  }
 
- /**
-  * Returns the type of open screen animation (default, fade, zoom, slidehorizontal,
-  * slidevertical and none).
-  *
-  * @return open screen animation
-  */
-  @SimpleProperty(category = PropertyCategory.APPEARANCE,
-    description = "The animation for switching to another screen. Valid" +
-    " options are default, fade, zoom, slidehorizontal, slidevertical, and none"    )
-  public String OpenScreenAnimation() {
-    return openAnimType;
-  }
-
   /**
    * Sets the animation type for the transition to another screen.
    *
    * @param animType the type of animation to use for the transition
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_SCREEN_ANIMATION,
-    defaultValue = "default")
-  @SimpleProperty
+      defaultValue = "default")
+  @SimpleFunction(description = "Sets the animation for switching to another screen. Valid" +
+ 		" options are default, fade, zoom, slidehorizontal, slidevertical, and none")
   public void OpenScreenAnimation(String animType) {
-    if ((animType != "default") &&
-      (animType != "fade") && (animType != "zoom") && (animType != "slidehorizontal") &&
-      (animType != "slidevertical") && (animType != "none")) {
-      this.dispatchErrorOccurredEvent(this, "Screen",
-        ErrorMessages.ERROR_SCREEN_INVALID_ANIMATION, animType);
-      return;
-    }
     openAnimType = animType;
-  }
-
- /**
-  * Returns the type of close screen animation (default, fade, zoom, slidehorizontal,
-  * slidevertical and none).
-  *
-  * @return open screen animation
-  */
-  @SimpleProperty(category = PropertyCategory.APPEARANCE,
-    description = "The animation for closing current screen and returning " +
-    " to the previous screen. Valid options are default, fade, zoom, slidehorizontal, " +
-    "slidevertical, and none")
-  public String CloseScreenAnimation() {
-    return closeAnimType;
   }
 
   /**
@@ -914,16 +1159,11 @@ public class Form extends Activity
    * @param animType the type of animation to use for the transition
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_SCREEN_ANIMATION,
-    defaultValue = "default")
-  @SimpleProperty
+      defaultValue = "default")
+  @SimpleFunction(description = "Sets the animation for closing current screen and returning " +
+     " to the previous screen. Valid options are default, fade, zoom, slidehorizontal, " +
+     "slidevertical, and none")
   public void CloseScreenAnimation(String animType) {
-    if ((animType != "default") &&
-      (animType != "fade") && (animType != "zoom") && (animType != "slidehorizontal") &&
-      (animType != "slidevertical") && (animType != "none")) {
-      this.dispatchErrorOccurredEvent(this, "Screen",
-        ErrorMessages.ERROR_SCREEN_INVALID_ANIMATION, animType);
-      return;
-    }
     closeAnimType = animType;
   }
 
@@ -1249,29 +1489,174 @@ public class Form extends Activity
   }
 
   // Configure the system menu to include a button to kill the application
-
+  // Add control menu actions by xcitizen.team@gmail.com
+  
+  /*
+  
+  PABLO: CREO QUE DEBERIAMOS QUITAR ESTE METODO Y USAR 
+  @OVERRIDE
+  onPrepareOptionsMenu (Menu menu)
+  QUE SE EJECUTA JUSTO ANTES DE GENERAR EL MENU, ONCREATEMENUOPTIONS SOLO SE EJECUTA LA PRIMERA VEZ
+  
+  LUEGO CREARIA UNA PROPIEDAD STRING QUE SE VEA EN EL EDITOR DEL ROLLO MENUOPTIONS Y QUE SIGA ESTE FORMATO
+  
+  "ENVIAR:ic_menu_send|SALIR:ic_menu_close_clear_cancel" CON EL SEPARADOR | PARA CADA OPCION Y LUEGO EL SEPARADOR : ENTRE TITULO:ICONO
+  
+  USARIAMOS MI SCRIPT PARA RESOLVER ICONOS Y PODRIAMOS UTILZAR ESTOS: http://www.darshancomputing.com/android/1.5-drawables.html
+  
+  MEDIANTE UNA SERIE DE SPLITS Y BUCLES FOR SE PUEDEN REGISTRAR LOS BOTONES CON SU TITULO Y SU ICONO
+  
+  LUEGO SOLAMENTE PONEMOS UN EVENTO DEL ROLLO ONMENUOPTION CON EL ARGUMENTO DEL TITULO DEL BOTON Y POR SUPUESTO ONMENUKEY
+  
+  */
+  
   @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    // This procedure is called only once.  To change the items dynamically
+  public boolean onPrepareOptionsMenu(Menu menu) {
+    // onCreateOptionsMenu This procedure is called only once.  To change the items dynamically
     // we would use onPrepareOptionsMenu.
-    super.onCreateOptionsMenu(menu);
+    super.onPrepareOptionsMenu(menu);
     // add the menu items
     // Comment out the next line if we don't want the exit button
     addExitButtonToMenu(menu);
     return true;
   }
 
+   @SimpleEvent(description = "Create function on menu item")
+  public static void OnMenuItem(String item) {
+    EventDispatcher.dispatchEvent(component, "OnMenuItem", item);
+  }
+/*
+   @SimpleEvent(description = "Create function on menu item 3")
+  public void FunctionMenuItem3() {
+    EventDispatcher.dispatchEvent(this, "FunctionMenuItem3");
+  }
+
+   @SimpleEvent(description = "Create function on menu item 4")
+  public void FunctionMenuItem4() {
+    EventDispatcher.dispatchEvent(this, "FunctionMenuItem4");
+  }
+
+   @SimpleEvent(description = "Create function on menu item 5")
+  public void FunctionMenuItem5() {
+    EventDispatcher.dispatchEvent(this, "FunctionMenuItem5");
+  }
+
+
+   @SimpleEvent(description = "Create function on menu item 6")
+  public void FunctionMenuItem6() {
+    EventDispatcher.dispatchEvent(this, "FunctionMenuItem6");
+  }
+  */
+  
+  
+  
+    @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "Close:ic_menu_close_clear_cancel|About:ic_menu_help")
+    @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description =  "")
+  public void MenuOptions(String options) {
+    this.menuOptions = options;
+  }
+  
+  @SimpleProperty(category = PropertyCategory.BEHAVIOR,
+      description =  "")
+  public String MenuOptions() {
+    return menuOptions;
+  }
+  
+  
+  
+  
   public void addExitButtonToMenu(Menu menu) {
-    MenuItem stopApplicationItem = menu.add(Menu.NONE, Menu.NONE, Menu.FIRST,
-    "Stop this application")
+  /*
+  MenuItem m1 = menu.add(Menu.NONE, Menu.NONE, Menu.FIRST, "Close")
+		.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+		  public boolean onMenuItemClick(MenuItem item) {
+			OnMenuItem("Close");
+			return true;
+		  }
+		});
+  MenuItem m2 = menu.add(Menu.NONE, Menu.NONE, Menu.FIRST, "About")
+		.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+		  public boolean onMenuItemClick(MenuItem item) {
+			OnMenuItem("About");
+			return true;
+		  }
+		}).setIcon(this.getResources().getIdentifier("ic_menu_help", "drawable", "android"));
+		
+		m1.setIcon(this.getResources().getIdentifier("ic_menu_close_clear_cancel", "drawable", "android"));
+*/
+  
+    menu.clear();
+	
+	if (menuOptions=="" || menuOptions==null) { return; }
+	final String[] menuItems = menuOptions.split("\\|"); // character |
+	for (int i = 0; i < menuItems.length; i++) {
+		//final String[] menuSet = menuItems[i].split("\u003a"); // character :
+		final String MenuSet = menuItems[i];
+		final int delim = MenuSet.indexOf(":");
+		
+		menu.add(Menu.NONE, Menu.NONE, Menu.FIRST, MenuSet.substring(0,delim))
+		.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+		  public boolean onMenuItemClick(MenuItem item) {
+			OnMenuItem(MenuSet.substring(0,delim));
+			return true;
+		  }
+		}).setIcon(getResources().getIdentifier(MenuSet.substring(delim+1), "drawable", "android"));
+	}
+	
+	
+	/*
+    MenuItem CompartirApplicationItem = menu.add(Menu.NONE, Menu.NONE, Menu.FIRST,
+    "Compartir")
     .setOnMenuItemClickListener(new OnMenuItemClickListener() {
       public boolean onMenuItemClick(MenuItem item) {
-        showExitApplicationNotification();
+        FunctionMenuItem2();
         return true;
-      }
+    }
+    });
+    MenuItem MapaApplicationItem = menu.add(Menu.NONE, Menu.NONE, Menu.FIRST,
+    "Mapa")
+    .setOnMenuItemClickListener(new OnMenuItemClickListener() {
+      public boolean onMenuItemClick(MenuItem item) {
+        FunctionMenuItem3();
+        return true;
+   }
+    });
+
+    MenuItem OpcionesApplicationItem = menu.add(Menu.NONE, Menu.NONE, Menu.FIRST,
+    "Opciones")
+    .setOnMenuItemClickListener(new OnMenuItemClickListener() {
+      public boolean onMenuItemClick(MenuItem item) {
+        FunctionMenuItem4();
+        return true;
+   }
+    });
+
+    MenuItem CamaraApplicationItem = menu.add(Menu.NONE, Menu.NONE, Menu.FIRST,
+    "Camara")
+    .setOnMenuItemClickListener(new OnMenuItemClickListener() {
+      public boolean onMenuItemClick(MenuItem item) {
+        FunctionMenuItem5();
+        return true;
+   }
+    });
+
+    MenuItem EnviarApplicationItem = menu.add(Menu.NONE, Menu.NONE, Menu.FIRST,
+    "Enviar")
+    .setOnMenuItemClickListener(new OnMenuItemClickListener() {
+      public boolean onMenuItemClick(MenuItem item) {
+        FunctionMenuItem6();
+        return true;
+   }
     });
     stopApplicationItem.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
-  }
+    CompartirApplicationItem.setIcon(android.R.drawable.ic_menu_share);
+    MapaApplicationItem.setIcon(android.R.drawable.ic_menu_compass);
+    OpcionesApplicationItem.setIcon(android.R.drawable.ic_menu_manage);
+    CamaraApplicationItem.setIcon(android.R.drawable.ic_menu_camera);
+    EnviarApplicationItem.setIcon(android.R.drawable.ic_menu_send);*/
+   }
+
 
   private void showExitApplicationNotification() {
     AlertDialog alertDialog = new AlertDialog.Builder(this).create();

@@ -32,6 +32,12 @@ import com.google.appinventor.client.editor.simple.components.MockTextBox;
 import com.google.appinventor.client.editor.simple.components.MockVerticalArrangement;
 import com.google.appinventor.client.editor.simple.components.MockVideoPlayer;
 import com.google.appinventor.client.editor.simple.components.MockWebViewer;
+
+import com.google.appinventor.client.editor.simple.components.MockScrollArrangement;
+import com.google.appinventor.client.editor.simple.components.MockHorizontalScroll;
+import com.google.appinventor.client.editor.simple.components.MockAdMob;
+
+
 import com.google.common.collect.Maps;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.Image;
@@ -82,7 +88,6 @@ public final class SimpleComponentDescriptor {
 
   private static void initBundledImages() {
     bundledImages.put("images/accelerometersensor.png", images.accelerometersensor());
-    bundledImages.put("images/nearfield.png", images.nearfield());
     bundledImages.put("images/activityStarter.png", images.activitystarter());
     bundledImages.put("images/barcodeScanner.png", images.barcodeScanner());
     bundledImages.put("images/bluetooth.png", images.bluetooth());
@@ -109,6 +114,10 @@ public final class SimpleComponentDescriptor {
     bundledImages.put("images/twitter.png", images.twitterComponent());
     bundledImages.put("images/voting.png", images.voting());
     bundledImages.put("images/web.png", images.web());
+	bundledImages.put("images/sqlite.png", images.sqlite());
+	bundledImages.put("images/files.png", images.files());
+	bundledImages.put("images/GoogleCloudMessaging.png", images.GoogleCloudMessaging());
+        bundledImages.put("images/admob.png", images.admob());
     imagesInitialized = true;
   }
 
@@ -288,6 +297,16 @@ public final class SimpleComponentDescriptor {
       return new MockVideoPlayer(editor);
     } else if (name.equals(MockWebViewer.TYPE)) {
       return new MockWebViewer(editor);
+	  
+	} else if (name.equals(MockScrollArrangement.TYPE)) {
+      return new MockScrollArrangement(editor);
+	} else if (name.equals(MockHorizontalScroll.TYPE)) {
+      return new MockHorizontalScroll(editor);
+	  
+	} else if (name.equals(MockAdMob.TYPE)) {
+      return new MockAdMob(editor);
+	  
+	  
     } else {
       // TODO(user): add 3rd party mock component proxy here
       throw new UnsupportedOperationException("unknown component: " + name);

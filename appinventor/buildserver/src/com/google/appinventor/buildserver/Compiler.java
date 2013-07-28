@@ -346,8 +346,17 @@ public final class Compiler {
       // the specified SDK version.  We might also want to allow users to specify minSdkVersion
       // or have us specify higher SDK versions when the program uses a component that uses
       // features from a later SDK (e.g. Bluetooth).
-      out.write("  <uses-sdk android:minSdkVersion=\"3\" />\n");
-
+      if (componentTypes.contains("GoogleCloudMessaging")) {
+		out.write("<permission android:name=\"" + packageName + ".permission.C2D_MESSAGE\" android:protectionLevel=\"signature\" /> \n" +
+				  "<uses-permission android:name=\"" + packageName + ".permission.C2D_MESSAGE\" /> \n" +
+		"<uses-sdk android:minSdkVersion=\"8\" />\n");
+	  } else  {
+		out.write("  <uses-sdk android:minSdkVersion=\"8\" />\n");
+	  }
+	  
+	  if (componentTypes.contains("AdMob")) {
+		out.write("<uses-sdk android:minSdkVersion=\"8\" android:targetSdkVersion=\"17\"/>\n");
+	  }
       // If we set the targetSdkVersion to 4, we can run full size apps on tablets.
       // On non-tablet hi-res devices like a Nexus One, the screen dimensions will be the actual
       // device resolution. Unfortunately, images, canvas, sprites, and buttons with images are not
@@ -386,14 +395,6 @@ public final class Compiler {
           // A secondary activity of the application.
           out.write("    <activity android:name=\"" + formClassName + "\" ");
         }
-
-        // This line is here for NearField and NFC.   It keeps the activity from
-        // restarting every time NDEF_DISCOVERED is signaled.
-        // TODO:  Check that this doesn't screw up other components.  Also, it might be
-        // better to do this programmatically when the NearField component is created, rather
-        // than here in the manifest.
-        out.write("android:launchMode=\"singleTask\" ");
-
         out.write("android:windowSoftInputMode=\"stateHidden\" ");
         out.write("android:configChanges=\"orientation|keyboardHidden\">\n");
 
@@ -406,18 +407,6 @@ public final class Compiler {
           out.write("        <category android:name=\"android.intent.category.LAUNCHER\" />\n");
         }
         out.write("      </intent-filter>\n");
-
-        if (componentTypes.contains("NearField") && !isForWireless) {
-          //  make the form respond to NDEF_DISCOVERED
-          //  this will trigger the form's onResume method
-          //  For now, we're handling text/plain only,but we can add more and make the Nearfield
-          // component check the type.
-          out.write("      <intent-filter>\n");
-          out.write("        <action android:name=\"android.nfc.action.NDEF_DISCOVERED\" />\n");
-          out.write("        <category android:name=\"android.intent.category.DEFAULT\" />\n");
-          out.write("        <data android:mimeType=\"text/plain\" />\n");
-          out.write("      </intent-filter>\n");
-        }
         out.write("    </activity>\n");
       }
 
@@ -451,7 +440,33 @@ public final class Compiler {
             "</intent-filter>  \n" +
         "</receiver> \n");
       }
-
+	  
+	  
+	  
+	  // BroadcastReceiver for GoogleCloudMessaging Component
+      if (componentTypes.contains("GoogleCloudMessaging")) {
+        System.out.println("Android Manifest: including GCM <receiver>&<service> tag");
+        out.write(
+            "<receiver \n" +
+            "android:name=\"com.google.appinventor.components.runtime.util.MyGCMBroadcastReceiver\" \n" + 
+            "android:permission=\"com.google.android.c2dm.permission.SEND\" > \n" +
+            "<intent-filter>\n" +
+            "    <action android:name=\"com.google.android.c2dm.intent.RECEIVE\" />\n" +
+            "    <action android:name=\"com.google.android.c2dm.intent.REGISTRATION\" />\n" +
+            "    <category android:name=\"" + packageName + "\" />\n" +
+            "</intent-filter>\n" +
+        "</receiver>\n" +
+        "<service android:name=\"com.google.appinventor.components.runtime.util.GCMIntentService\" /> \n");
+      }
+	  
+	  if (componentTypes.contains("AdMob")) {
+        System.out.println("Android Manifest: including AdMob");
+        out.write(
+           "<activity android:name=\"com.google.ads.AdActivity\" \n" +
+           "android:configChanges=\"keyboard|keyboardHidden|orientation\" /> \n");
+     }
+	  
+	  
       out.write("  </application>\n");
       out.write("</manifest>\n");
       out.close();

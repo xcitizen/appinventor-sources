@@ -189,7 +189,6 @@ public class TextViewUtil {
     textview.setTextColor(colorStateList);
   }
   
-  
   /**
    * Sets the text focus enable.
    */

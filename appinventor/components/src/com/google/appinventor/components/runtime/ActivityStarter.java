@@ -458,10 +458,10 @@ public class ActivityStarter extends AndroidNonvisibleComponent
   public void onDelete() {
     form.unregisterForActivityResult(this);
   }
-   
+  
   /**
    * Block ShareText:
-   * Lauch activity for share text directly xcitizen.team@gmail.com
+   * Lauch activity for share text directly xcitizen.team@Gmail.com
    *
    */
    
@@ -477,4 +477,6 @@ public class ActivityStarter extends AndroidNonvisibleComponent
       String openAnim = container.$form().getOpenAnimType();
       AnimationUtil.ApplyOpenScreenAnimation(container.$context(), openAnim);
     }
+   
+   
 }

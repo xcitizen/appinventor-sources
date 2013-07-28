@@ -24,6 +24,7 @@ import android.view.Gravity;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.app.ProgressDialog;
 
 /**
  * The Notifier component displays alert messages and creates Android log entries through
@@ -59,6 +60,7 @@ import android.widget.Toast;
 public final class Notifier extends AndroidNonvisibleComponent implements Component {
 
   private static final String LOG_TAG = "Notifier";
+  private ProgressDialog progress = null;
   private final Activity activity;
   private final Handler handler;
 
@@ -295,5 +297,43 @@ public final class Notifier extends AndroidNonvisibleComponent implements Compon
   @SimpleFunction
   public void LogInfo(String message) {
     Log.i(LOG_TAG, message);
+  }
+  
+  /**
+   * Añade la opción de lanzar una caja a modo de carga/conexion o busqueda.
+   * -Se puede lanzar eligiendo el texto del titulo y el mensage.
+   * -Es obligatorio cerrarlo, temporizando o añadiendolo a algún procedimiento.
+   * Add the option to launch a box as a load / Connect or search.
+   * -You can launch select the text of the title and the message.
+   * -Is mandatory close, clocking or adding it to a procedure.
+   * @author xcitizen.team@gmail.com (José Mª Martín)
+   */
+  @SimpleFunction(description = "Se añade un dialogo a modo de cargando pudiendo introducir el titulo y el mensaje"+
+  "Es obligatorio cerrarlo, temporizando o añadiendolo a algún procedimiento." +
+  "Is added as a loading dialogue can enter the title and message" + 
+  "Is mandatory close, clocking or adding it to a procedure.")
+  public void LaunchConect(String message, String title) {
+    progress = ProgressDialog.show(activity, title, message);
+  }
+
+   @SimpleFunction(description = "Sirve para eliminar el dialogo de cargando de la pantalla" + 
+   "Use to eliminate loading dialog screen.")
+   public void ClearConect() {
+     progress.dismiss();
+   }
+
+  /**
+   * Vieja notificación TOAST
+   * Old notification TOAST
+   * @author xcitizen.team@gmail.com
+   */
+
+  @SimpleFunction(description = "Vieja notificación TOAST" + "Old notification TOAST")
+  public void ShowOldAlert(final String notice) {
+    handler.post(new Runnable() {
+      public void run() {
+        Toast.makeText(activity, notice, Toast.LENGTH_LONG).show();
+      }
+    });
   }
 }
